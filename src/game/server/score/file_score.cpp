@@ -41,6 +41,10 @@ CFileScore::~CFileScore()
 	lock_unlock(gs_ScoreLock);
 }
 
+void CFileScore::Process()
+{
+}
+
 std::string SaveFile()
 {
 	std::ostringstream oss;
@@ -229,7 +233,7 @@ void CFileScore::LoadScore(int ClientID)
 	}
 }
 
-void CFileScore::SaveTeamScore(int* ClientIDs, unsigned int Size, float Time, const char *pTimestamp)
+/*void CFileScore::SaveTeamScore(int* ClientIDs, unsigned int Size, float Time, const char *pTimestamp)
 {
 	dbg_msg("filescore", "saveteamscore not implemented for filescore");
 }
@@ -240,6 +244,11 @@ void CFileScore::SaveScore(int ClientID, float Time, const char *pTimestamp,
 	CConsole* pCon = (CConsole*) GameServer()->Console();
 	if (!pCon->m_Cheated || g_Config.m_SvRankCheats)
 		UpdatePlayer(ClientID, Time, CpTime);
+}*/
+
+void CFileScore::OnFinish(unsigned int Size, int* ClientID, float Time, const char *pTimestamp,
+			float* CpTime[NUM_CHECKPOINTS], bool Team, bool NotEligible)
+{
 }
 
 void CFileScore::ShowTop5(IConsole::IResult *pResult, int ClientID,

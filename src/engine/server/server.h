@@ -8,6 +8,10 @@
 #include <engine/shared/memheap.h>
 #include <engine/shared/fifo.h>
 
+#ifdef CONF_RPC
+#include <engine/server/rpc/rpc_client.h>
+#endif
+
 class CSnapIDPool
 {
 	enum
@@ -131,6 +135,8 @@ public:
 		int m_Authed;
 		int m_AuthTries;
 
+		int m_JoinTick;
+
 		int m_MapChunk;
 		bool m_NoRconNote;
 		bool m_Quitting;
@@ -203,6 +209,10 @@ public:
 	CRegister m_Register;
 	CMapChecker m_MapChecker;
 
+#ifdef CONF_RPC
+    CRPCClient* m_pRPCClient;
+#endif
+
 	CServer();
 
 	int TrySetClientName(int ClientID, const char* pName);
@@ -234,6 +244,7 @@ public:
 	const char *ClientName(int ClientID) const;
 	const char *ClientClan(int ClientID) const;
 	int ClientCountry(int ClientID) const;
+	int ClientJoinTick(int ClientID) const;
 	bool ClientIngame(int ClientID) const;
 	int MaxClients() const;
 
@@ -294,6 +305,10 @@ public:
 	void SnapSetStaticsize(int ItemType, int Size);
 
 	void RestrictRconOutput(int ClientID) { m_RconRestrict = ClientID; }
+
+#ifdef CONF_RPC
+	virtual CRPCClient* RPC() { return m_pRPCClient; }
+#endif
 };
 
 #endif

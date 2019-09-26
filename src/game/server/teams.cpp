@@ -460,9 +460,9 @@ void CGameTeams::OnTeamFinish(CPlayer** Players, unsigned int Size, float Time, 
 			GameServer()->SendChatTarget(-1, aBuf);
 		}
 	}
-
-	if (CallSaveScore && Size >= 2)
-		GameServer()->Score()->SaveTeamScore(PlayerCIDs, Size, Time, pTimestamp);
+	// TODO:
+	//if (CallSaveScore && Size >= 2)
+	//	GameServer()->Score()->SaveTeamScore(PlayerCIDs, Size, Time, pTimestamp);
 }
 
 void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
@@ -528,10 +528,12 @@ void CGameTeams::OnFinish(CPlayer* Player, float Time, const char *pTimestamp)
 		CallSaveScore = true;
 	}
 
+	/* TODO:
 	if (CallSaveScore)
 		if (g_Config.m_SvNamelessScore || !str_startswith(Server()->ClientName(Player->GetCID()), "nameless tee"))
 			GameServer()->Score()->SaveScore(Player->GetCID(), Time, pTimestamp,
 					GetCpCurrent(Player), Player->m_NotEligibleForFinish);
+					*/
 
 	// update server best time
 	if (GameServer()->m_pController->m_CurrentRecord == 0

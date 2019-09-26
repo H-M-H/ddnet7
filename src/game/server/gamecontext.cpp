@@ -22,6 +22,10 @@
 #include "score.h"
 #include "score/file_score.h"
 
+#ifdef CONF_RPC
+#include "score/rpc_score.h"
+#endif
+
 enum
 {
 	RESET,
@@ -565,6 +569,8 @@ void CGameContext::OnTick()
 		m_TeeHistorian.BeginPlayers();
 	}
 
+	m_pScore->Process();
+
 	// copy tuning
 	m_World.m_Core.m_Tuning = m_Tuning;
 	m_World.Tick();
@@ -771,6 +777,8 @@ void CGameContext::OnClientEnter(int ClientID)
 		Score()->PlayerData(ClientID)->m_CurrentTime = Score()->PlayerData(ClientID)->m_BestTime;
 		m_apPlayers[ClientID]->m_Score = !Score()->PlayerData(ClientID)->m_BestTime ? -9999 : Score()->PlayerData(ClientID)->m_BestTime;
 	}
+
+	Score()->CheckBirthday(ClientID);
 
 	m_VoteUpdate = true;
 
@@ -2033,7 +2041,14 @@ void CGameContext::OnInit()
 	// delete old score object
 	if (m_pScore)
 		delete m_pScore;
+#ifdef CONF_RPC
+	if (str_length(g_Config.m_SvRPCAddress) != 0)
+		m_pScore = new CRPCScore(this);
+	else
+		m_pScore = new CFileScore(this);
+#else
 	m_pScore = new CFileScore(this);
+#endif
 
 	// create all entities from the game layer
 	CMapItemLayerTilemap *pTileMap = m_Layers.GameLayer();
@@ -2398,6 +2413,7 @@ bool CGameContext::IsClientSpectator(int ClientID) const
 	return m_apPlayers[ClientID] && m_apPlayers[ClientID]->GetTeam() == TEAM_SPECTATORS;
 }
 
+CUuid CGameContext::GameUuid() { return m_GameUuid; }
 const char *CGameContext::GameType() const { return m_pController && m_pController->GetGameType() ? m_pController->GetGameType() : ""; }
 const char *CGameContext::Version() const { return GAME_VERSION; }
 const char *CGameContext::NetVersion() const { return GAME_NETVERSION; }

@@ -1,0 +1,68 @@
+#include "rpc_client.h"
+
+using namespace rpc;
+
+RPCException::RPCException(const char* pStr, const grpc::Status St) : m_What(pStr), m_Status(St) {}
+RPCException::RPCException(std::string Str, const grpc::Status St) : m_What(Str), m_Status(St) {}
+const grpc::Status& RPCException::Status() { return m_Status; }
+
+const char* RPCException::what() const noexcept { return m_What.c_str(); }
+
+CRPCClient::CRPCClient(const char* pAddr, int NumThreads) :
+	m_Run(true),
+	m_Channel(grpc::CreateChannel(pAddr, grpc::InsecureChannelCredentials())),
+## for s, ms in Services
+	m_{{s}}Service({{s}}::NewStub(m_Channel)),
+## endfor
+	m_RPCThreads()
+{
+	for (int i = 0; i < NumThreads; ++i)
+		m_RPCThreads.emplace_back(&CRPCClient::Run, this);
+
+}
+
+void CRPCClient::Run()
+{
+	while (m_Run)
+	{
+		std::function<void()> Func;
+		m_CallQueue.Consume([&Func](std::function<void()>& F) { Func = std::move(F); });
+		Func();
+	}
+}
+
+## for s, ms in Services
+## for m, t in ms
+CFuture<{{t.Out}}> CRPCClient::{{m}}(const std::shared_ptr<{{t.In}}> Msg)
+{
+		std::shared_ptr<std::promise<{{t.Out}}>> Promise = std::make_shared<std::promise<{{t.Out}}>>();
+		m_CallQueue.Emplace([this, Promise, Msg]()
+				{
+						grpc::ClientContext Context;
+						{{t.Out}} Out;
+						const grpc::Status Status = m_{{s}}Service->{{m}}(&Context, *Msg.get(), &Out);
+						if (Status.ok())
+								Promise->set_value(std::move(Out));
+						else
+								Promise->set_exception(
+									std::make_exception_ptr(
+										RPCException("Failed to process RPC: {{m}}. " + Status.error_message() + " " + Status.error_details(), std::move(Status))
+									)
+								);
+				}
+		);
+		return CFuture<{{t.Out}}>(Promise->get_future());
+}
+## endfor
+## endfor
+
+
+CRPCClient::~CRPCClient()
+{
+	m_Run = false;
+	for (size_t i = 0; i < m_RPCThreads.size(); ++i)
+		m_CallQueue.Emplace([]() {});
+	for (std::thread& Thread : m_RPCThreads)
+		Thread.join();
+}
+

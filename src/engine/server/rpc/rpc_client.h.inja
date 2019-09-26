@@ -1,0 +1,53 @@
+#pragma once
+
+#include <atomic>
+#include <exception>
+#include <memory>
+#include <thread>
+#include <string>
+#include <vector>
+
+#include <grpcpp/grpcpp.h>
+
+#include <base/tl/future.h>
+#include <base/tl/queue.h>
+#include "rpc.grpc.pb.h"
+
+class RPCException : public std::exception
+{
+public:
+	RPCException(const char* pStr, const grpc::Status);
+	RPCException(std::string Str, const grpc::Status);
+	const grpc::Status& Status();
+	const char* what() const noexcept override;
+
+private:
+	std::string m_What;
+	const grpc::Status m_Status;
+};
+
+class CRPCClient
+{
+public:
+	CRPCClient(const char* pAddr, int NumThreads = 2);
+	~CRPCClient();
+
+## for s, ms in Services
+## for m, t in ms
+	CFuture<rpc::{{t.Out}}> {{m}}(const std::shared_ptr<rpc::{{t.In}}> Msg);
+## endfor
+## endfor
+
+private:
+	void Run();
+
+	std::atomic_bool m_Run;
+	std::shared_ptr<grpc::Channel> m_Channel;
+	CQueue<std::function<void()>> m_CallQueue;
+
+## for s, ms in Services
+	std::unique_ptr<rpc::{{s}}::Stub> m_{{s}}Service;
+## endfor
+
+	std::vector<std::thread> m_RPCThreads;
+};

@@ -75,9 +75,8 @@ public:
 	virtual void MapVote(std::shared_ptr<CMapVoteResult> *ppResult, int ClientID, const char *pMapName) = 0;
 	virtual void CheckBirthday(int ClientID) = 0;
 	virtual void LoadScore(int ClientID) = 0;
-	virtual void SaveScore(int ClientID, float Time, const char *pTimestamp, float aCpTime[NUM_CHECKPOINTS], bool NotEligible) = 0;
-
-	virtual void SaveTeamScore(int *pClientIDs, unsigned int Size, float Time, const char *pTimestamp) = 0;
+	virtual void OnFinish(unsigned int Size, int* ClientID, float Time, const char *pTimestamp,
+			float* CpTime[NUM_CHECKPOINTS], bool Team, bool NotEligible) = 0;
 
 	virtual void ShowTop5(IConsole::IResult *pResult, int ClientID, void *pUserData, int Debut=1) = 0;
 	virtual void ShowRank(int ClientID, const char *pName, bool Search=false) = 0;
@@ -90,6 +89,8 @@ public:
 
 	virtual void SaveTeam(int Team, const char *pCode, int ClientID, const char *pServer) = 0;
 	virtual void LoadTeam(const char *pCode, int ClientID) = 0;
+
+	virtual void Process() = 0;
 
 	// called when the server is shut down but not on mapchange/reload
 	virtual void OnShutdown() = 0;
