@@ -77,7 +77,7 @@ public:
 	virtual void DemoRecorder_HandleAutoStart() = 0;
 	virtual bool DemoRecorder_IsRecording() = 0;
 
-	virtual class CRPCClient* RPC() = 0;
+	virtual class CDatabaseClient* RPC() = 0;
 };
 
 class IGameServer : public IInterface

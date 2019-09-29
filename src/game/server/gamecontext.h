@@ -122,6 +122,7 @@ public:
 
 	// voting
 	void StartVote(const char *pDesc, const char *pCommand, const char *pReason);
+	void StartMapVote(const char* pMapName, const char* pServerType, int ClientID);
 	void EndVote(int Type, bool Force);
 	void ForceVote(int Type, const char *pDescription, const char *pReason);
 	void SendVoteSet(int Type, int ToClientID);

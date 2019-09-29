@@ -9,7 +9,7 @@
 #include <engine/shared/fifo.h>
 
 #ifdef CONF_RPC
-#include <engine/server/rpc/rpc_client.h>
+#include <engine/server/rpc/database_client.h>
 #endif
 
 class CSnapIDPool
@@ -210,7 +210,7 @@ public:
 	CMapChecker m_MapChecker;
 
 #ifdef CONF_RPC
-    CRPCClient* m_pRPCClient;
+    CDatabaseClient* m_pRPCClient;
 #endif
 
 	CServer();
@@ -307,7 +307,7 @@ public:
 	void RestrictRconOutput(int ClientID) { m_RconRestrict = ClientID; }
 
 #ifdef CONF_RPC
-	virtual CRPCClient* RPC() { return m_pRPCClient; }
+	virtual CDatabaseClient* RPC() { return m_pRPCClient; }
 #endif
 };
 

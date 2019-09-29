@@ -1146,32 +1146,32 @@ target_include_directories(protoc-gen-inja PRIVATE "src/tools/rpc/include")
 
 set(_RPC_PATH "${CMAKE_CURRENT_LIST_DIR}/src/engine/server/rpc")
 
-add_custom_command(OUTPUT "${_RPC_PATH}/rpc_client.cpp" "${_RPC_PATH}/rpc_client.h"
-  COMMAND "${Protobuf_PROTOC_EXECUTABLE}" -I"${_RPC_PATH}" "${_RPC_PATH}/rpc.proto"
+add_custom_command(OUTPUT "${_RPC_PATH}/database_client.cpp" "${_RPC_PATH}/database_client.h"
+  COMMAND "${Protobuf_PROTOC_EXECUTABLE}" -I"${_RPC_PATH}" "${_RPC_PATH}/database.proto"
             --inja_out="${_RPC_PATH}"
-            --inja_opt="Template=${_RPC_PATH}/rpc_client.h.inja,Out=rpc_client.h"
+            --inja_opt="Template=${_RPC_PATH}/database_client.h.inja,Out=database_client.h"
             --plugin=./protoc-gen-inja
-  COMMAND protoc -I"${_RPC_PATH}" "${_RPC_PATH}/rpc.proto"
+  COMMAND protoc -I"${_RPC_PATH}" "${_RPC_PATH}/database.proto"
             --inja_out="${_RPC_PATH}"
-            --inja_opt="Template=${_RPC_PATH}/rpc_client.cpp.inja,Out=rpc_client.cpp"
+            --inja_opt="Template=${_RPC_PATH}/database_client.cpp.inja,Out=database_client.cpp"
             --plugin=./protoc-gen-inja
-    DEPENDS protoc-gen-inja "${_RPC_PATH}/rpc.proto" "${_RPC_PATH}/rpc_client.cpp.inja" "${_RPC_PATH}/rpc_client.h.inja"
+    DEPENDS protoc-gen-inja "${_RPC_PATH}/database.proto" "${_RPC_PATH}/database_client.cpp.inja" "${_RPC_PATH}/database_client.h.inja"
     WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
 )
 
-set(PROTOC_OUT "${_RPC_PATH}/rpc.pb.h" "${_RPC_PATH}/rpc.pb.cc")
+set(PROTOC_OUT "${_RPC_PATH}/database.pb.h" "${_RPC_PATH}/database.pb.cc")
 
 add_custom_command(OUTPUT ${PROTOC_OUT}
-  COMMAND "${Protobuf_PROTOC_EXECUTABLE}" -I"${_RPC_PATH}" "${_RPC_PATH}/rpc.proto"
+  COMMAND "${Protobuf_PROTOC_EXECUTABLE}" -I"${_RPC_PATH}" "${_RPC_PATH}/database.proto"
           --cpp_out="${_RPC_PATH}"
-    DEPENDS "${_RPC_PATH}/rpc.proto"
+    DEPENDS "${_RPC_PATH}/database.proto"
 )
 
-grpc_generate_cpp(GRPC_SRCS GRPC_HDRS "${_RPC_PATH}" "${_RPC_PATH}/rpc.proto")
+grpc_generate_cpp(GRPC_SRCS GRPC_HDRS "${_RPC_PATH}" "${_RPC_PATH}/database.proto")
 
 set(ENGINE_SERVER_RPC
-  "${_RPC_PATH}/rpc_client.h"
-  "${_RPC_PATH}/rpc_client.cpp"
+  "${_RPC_PATH}/database_client.h"
+  "${_RPC_PATH}/database_client.cpp"
   ${PROTOC_OUT}
   ${GRPC_SRCS} ${GRPC_HDRS}
 )

@@ -425,6 +425,24 @@ void CGameContext::StartVote(const char *pDesc, const char *pCommand, const char
 	m_VoteUpdate = true;
 }
 
+void CGameContext::StartMapVote(const char* pMapName, const char* pServerType, int ClientID)
+{
+	m_VoteKick = false;
+	m_VoteSpec = false;
+	m_LastMapVote = time_get();
+
+	char aCmd[256];
+	std::string ServerType(pServerType);
+	std::transform(ServerType.begin(), ServerType.end(), ServerType.begin(), [](unsigned char c) { return std::tolower(c); });
+	str_format(aCmd, sizeof(aCmd), "sv_reset_file types/%s/flexreset.cfg; change_map \"%s\"", ServerType.c_str(), pMapName);
+
+	char aChatmsg[512];
+	str_format(aChatmsg, sizeof(aChatmsg), "'%s' called vote to change server option '%s' (%s)", Server()->ClientName(ClientID), pMapName, "/map");
+	SendChat(-1, CHAT_ALL, ClientID, aChatmsg);
+
+	StartVote(pMapName, aCmd, "/map");
+}
+
 
 void CGameContext::EndVote(int Type, bool Force)
 {

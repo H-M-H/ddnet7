@@ -11,13 +11,13 @@
 
 #include <base/tl/future.h>
 #include <base/tl/queue.h>
-#include "rpc.grpc.pb.h"
+#include "database.grpc.pb.h"
 
-class RPCException : public std::exception
+class DatabaseException : public std::exception
 {
 public:
-	RPCException(const char* pStr, const grpc::Status);
-	RPCException(std::string Str, const grpc::Status);
+	DatabaseException(const char* pStr, const grpc::Status);
+	DatabaseException(std::string Str, const grpc::Status);
 	const grpc::Status& Status();
 	const char* what() const noexcept override;
 
@@ -26,15 +26,15 @@ private:
 	const grpc::Status m_Status;
 };
 
-class CRPCClient
+class CDatabaseClient
 {
 public:
-	CRPCClient(const char* pAddr, int NumThreads = 2);
-	~CRPCClient();
+	CDatabaseClient(const char* pAddr, int NumThreads = 2);
+	~CDatabaseClient();
 
 ## for s, ms in Services
 ## for m, t in ms
-	CFuture<rpc::{{t.Out}}> {{m}}(const std::shared_ptr<rpc::{{t.In}}> Msg);
+	CFuture<db::{{t.Out}}> {{m}}(const std::shared_ptr<db::{{t.In}}> Msg);
 ## endfor
 ## endfor
 
@@ -46,7 +46,7 @@ private:
 	CQueue<std::function<void()>> m_CallQueue;
 
 ## for s, ms in Services
-	std::unique_ptr<rpc::{{s}}::Stub> m_{{s}}Service;
+	std::unique_ptr<db::{{s}}::Stub> m_{{s}}Service;
 ## endfor
 
 	std::vector<std::thread> m_RPCThreads;

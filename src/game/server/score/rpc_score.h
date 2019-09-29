@@ -4,7 +4,7 @@
 #include <functional>
 
 #include <engine/server.h>
-#include <engine/server/rpc/rpc_client.h>
+#include <engine/server/rpc/database_client.h>
 
 #include "../score.h"
 #include "../player.h"
@@ -44,7 +44,13 @@ public:
 private:
 	CGameContext *GameServer() { return m_pGameServer; }
 	IServer *Server() { return m_pServer; }
-	CRPCClient *RPC() {return m_pRPC; }
+	CDatabaseClient *RPC() {return m_pRPC; }
+
+	template<typename T>
+	void AddPendingRequest(T&& Func)
+	{
+		m_PendingRequests.emplace_back(std::forward<T>(Func));
+	}
 
 	CGameContext *m_pGameServer;
 	IServer *m_pServer;
@@ -54,6 +60,6 @@ private:
 
 	std::vector<std::function<bool()>> m_PendingRequests;
 
-	CRPCClient *m_pRPC;
+	CDatabaseClient *m_pRPC;
 
 };

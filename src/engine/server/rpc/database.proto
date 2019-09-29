@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package rpc;
+package db;
 
 import "google/protobuf/timestamp.proto";
 
@@ -11,15 +11,15 @@ service Database {
 	rpc FindMap(MapName) returns (MapAndServer);
 	rpc MapInfo(MapName) returns (Message);
 	rpc OnFinish(Finish) returns (Chat);
-	rpc GetRank(PlayerAndMap) returns (Rank);
-	rpc GetTeamRank(PlayerAndMap) returns (TeamRank);
+	rpc ShowRank(PlayerAndMap) returns (Message);
+	rpc ShowTeamRank(PlayerAndMap) returns (Message);
 	rpc ShowTop(TopRankRequest) returns (Message);
 	rpc ShowTopTeam(TopRankRequest) returns (Message);
 	rpc ShowTimes(PlayerAndMap) returns (Message);
 	rpc ShowPoints(PlayerName) returns (Message);
 	rpc ShowTopPoints(TopPointsRequest) returns (Message);
 	rpc GetRandomMap(RandomMapRequest) returns (MapName);
-	rpc GetRandomUnfinishedMap(RandomMapRequest) returns (MapName);
+	rpc GetRandomUnfinishedMap(RandomUnfinishedMapRequest) returns (MapName);
 	rpc SaveTeam(TeamSave) returns (Message);
 	rpc LoadTeam(TeamLoadRequest) returns (TeamSave);
 }
@@ -67,6 +67,13 @@ message RandomMapRequest {
 	string current_map = 1;
 	string server_type = 2;
 	int32 stars = 3;
+}
+
+message RandomUnfinishedMapRequest {
+	string current_map = 1;
+	string server_type = 2;
+	int32 stars = 3;
+	string player_name = 4;
 }
 
 message BirthdayYears {
@@ -178,7 +185,6 @@ message TeeSave {
 
 	string game_uuid = 47;
 }
-
 
 message SimpleSwitchers
 {

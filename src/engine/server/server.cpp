@@ -1429,7 +1429,7 @@ int CServer::Run()
 	}
 
 #ifdef CONF_RPC
-	CRPCClient RPCClient(g_Config.m_SvRPCAddress);
+	CDatabaseClient RPCClient(g_Config.m_SvRPCAddress);
 	m_pRPCClient = &RPCClient;
 #endif
 
